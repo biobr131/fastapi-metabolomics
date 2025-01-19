@@ -8,5 +8,3 @@ ARG REQ_TXT
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r ${REQ_DIR}${REQ_TXT} && \
     pip install --no-cache-dir --pre sqlacodegen
-
-COPY . .
