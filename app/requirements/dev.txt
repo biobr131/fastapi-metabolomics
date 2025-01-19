@@ -1,0 +1,13 @@
+-r common.txt
+black
+ruff
+mypy
+tox
+pytest
+pytest-randomly
+pytest-cov
+pytest-structlog
+factory-boy
+fastapi-debug-toolbar
+sphinx
+--pre sqlacodegen

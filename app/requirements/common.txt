@@ -1,0 +1,7 @@
+psycopg[binary]
+fastapi[all]
+fastapi-structlog
+uvicorn[standard]
+sqlmodel
+alembic
+sqladmin[full]

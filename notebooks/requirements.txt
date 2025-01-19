@@ -1,0 +1,36 @@
+black
+ruff
+mypy
+tox
+pytest
+pytest-snapshot
+structlog
+pytest-structlog
+line_profiler
+memory_profiler
+pandas[performance, plot, computation, excel]
+polars-lts-cpu
+ibis-framework[pandas, polars]
+statsmodels
+japanize-matplotlib
+seaborn
+fastcluster
+statannotations
+requests
+scikit-learn
+rdkit
+biopython
+bioinfokit
+scanpy
+jupyterlab
+ipywidgets
+ipympl
+ipytest
+pygwalker
+python-dotenv
+psycopg[binary]
+sqlalchemy
+pydantic
+sqlmodel
+pandera[polars]
+sphinx
