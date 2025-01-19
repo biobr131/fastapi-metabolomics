@@ -7,7 +7,7 @@ from api.crud.base import (
     create_model, retrieve_schemas, retrieve_schema, update_model, delete_model
 )
 from api.schemas.base import RetrieveModelsQuery, RetrieveModelQuery
-from api.dependencies import get_session
+from api.dependencies import get_session_dev, get_session_prod
 
 TABLES = {"table_name": {
     "table_type": "master or transaction",
@@ -24,7 +24,7 @@ router = APIRouter()
 
 
 @router.get(f"/{HEALTH_CHECK_ROUTE}", response_model=dict)
-async def check_health(session: Session = Depends(get_session)):
+async def check_health(session: Session = Depends(get_session_prod)):
     return check_connection(session)
 
 
@@ -32,7 +32,7 @@ router_dev = APIRouter()
 
 
 @router_dev.get(f"/{HEALTH_CHECK_ROUTE}", response_model=dict)
-async def check_health_dev(session: Session = Depends(get_session)):
+async def check_health_dev(session: Session = Depends(get_session_dev)):
     return check_connection(session)
 
 """

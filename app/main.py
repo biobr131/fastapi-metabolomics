@@ -5,26 +5,30 @@ from fastapi.staticfiles import StaticFiles
 #from sqladmin import Admin
 
 #from db.session import get_engine
-from api.dependencies import DEBUG
 from api.routers import base
+
+
+def strtobool(value: str) -> bool:
+    """文字列をbool型に変換する。"""
+    return value.lower() in ('true', 't', 'yes', 'y', 'on', '1')
+
+DEBUG = bool(strtobool(str(os.environ.get("DEBUG", "False"))))
 
 app = FastAPI(debug=DEBUG)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
-if DEBUG:
-    app.include_router(
-        base.router_dev,
-        prefix="/api-dev",
-        tags=["開発環境"],
-    )
-else:
-    app.include_router(
-        base.router,
-        prefix="/api",
-        tags=["本番環境"],
-    )
+app.include_router(
+    base.router_dev,
+    prefix="/api-dev",
+    tags=["開発環境"],
+)
+app.include_router(
+    base.router,
+    prefix="/api",
+    tags=["本番環境"],
+)
 
 #if DEBUG:
     #dotenv_file = "db/.env"
