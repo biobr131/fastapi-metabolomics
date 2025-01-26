@@ -1,4 +1,4 @@
-alembic==1.14.0
+alembic==1.14.1
 annotated-types==0.7.0
 anyio==4.8.0
 asgi-correlation-id==4.3.4
@@ -6,7 +6,7 @@ certifi==2024.12.14
 click==8.1.8
 dnspython==2.7.0
 email_validator==2.2.0
-fastapi==0.115.6
+fastapi==0.115.7
 fastapi-cli==0.0.7
 fastapi-structlog==0.5.0
 greenlet==3.1.1
@@ -27,7 +27,7 @@ orjson==3.10.15
 packaging==24.2
 psycopg==3.2.4
 psycopg-binary==3.2.4
-pydantic==2.10.5
+pydantic==2.10.6
 pydantic-extra-types==2.10.2
 pydantic-settings==2.7.1
 pydantic_core==2.27.2
@@ -44,7 +44,7 @@ sqlacodegen-v2==0.1.4
 sqladmin==0.20.1
 SQLAlchemy==2.0.37
 sqlmodel==0.0.22
-starlette==0.41.3
+starlette==0.45.3
 structlog==24.4.0
 structlog-sentry==2.2.1
 typeguard==4.4.1
@@ -55,5 +55,5 @@ urllib3==2.3.0
 uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.0.4
-websockets==14.1
+websockets==14.2
 WTForms==3.1.2
