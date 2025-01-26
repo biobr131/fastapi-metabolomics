@@ -5,13 +5,13 @@ from sqlalchemy import create_engine, engine, URL
 from sqlalchemy.orm import sessionmaker
 
 
-def get_engine(dotenv_file: str) -> engine.Engine:
+def get_engine(dotenv_path: str) -> engine.Engine:
     """
     データベース接続のためのEngineを作成する。
 
     Parameters
     ----------
-    dotenv_file : str
+    dotenv_path : str
         .envファイルのパス
     
     Returns
@@ -19,7 +19,7 @@ def get_engine(dotenv_file: str) -> engine.Engine:
     engine.Engine
         データベース接続のためのEngine
     """
-    config = dotenv_values(dotenv_file)
+    config = dotenv_values(dotenv_path)
 
     url_object = URL.create(
         "postgresql+psycopg",

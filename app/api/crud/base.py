@@ -5,7 +5,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from api.schemas.base import (
-    FilteringColumn, OrderOption, OrderingColumn, AggregationOption, GroupingColumn,
+    FilteredColumn, OrderOption, OrderedColumn, AggregationOption, GroupedColumn,
 )
 
 
@@ -26,18 +26,18 @@ def check_connection(session: Session) -> dict:
         }
 
 
-def add_filter(statement, filtering_columns: Optional[List[FilteringColumn]]):
-    if filtering_columns is not None:
+def add_filter(statement, filtered_columns: Optional[List[FilteredColumn]]):
+    if filtered_columns is not None:
         statement = statement.filter_by(
-            **{filtering_column.column: filtering_column.value for filtering_column in filtering_columns}
+            **{filtering_column.column: filtering_column.value for filtering_column in filtered_columns}
         )
     return statement
 
 
-def add_order(statement, ordering_columns: Optional[List[OrderingColumn]]):
-    if ordering_columns is not None:
+def add_order(statement, ordered_columns: Optional[List[OrderedColumn]]):
+    if ordered_columns is not None:
         orders = []
-        for ordering_column in ordering_columns:
+        for ordering_column in ordered_columns:
             if ordering_column.option == OrderOption.ascending:
                 orders.append(ordering_column)
             else:
@@ -46,10 +46,10 @@ def add_order(statement, ordering_columns: Optional[List[OrderingColumn]]):
     return statement
 
 
-def add_group(statement, grouping_columns: Optional[List[GroupingColumn]], Model):
-    if grouping_columns is not None:
+def add_group(statement, grouped_columns: Optional[List[GroupedColumn]], Model):
+    if grouped_columns is not None:
         aggr_funcs = []
-        for column in grouping_columns:
+        for column in grouped_columns:
             if column.aggr == AggregationOption.count:
                 aggr_funcs.append(
                     func.count(getattr(Model, column.column).label(column.column))
@@ -127,7 +127,7 @@ def get_verbose_dict(session: Session, model, tables):
             ReferenceModel = get_reference_model_class(column, tables)
             reference_model_table_name = ReferenceModel.__table__.name
             reference_model_id = model.column
-            filtering_column = FilteringColumn(
+            filtering_column = FilteredColumn(
                 column=getattr(tables[reference_model_table_name], column), value=reference_model_id
             )
             reference_model = retrieve_model(
@@ -156,23 +156,23 @@ def create_model(
 def retrieve_models(
         session: Session, tables: dict, table_name: str,
         retrieved_columns: Optional[List[str]], offset: int, limit: int,
-        filtering_columns: Optional[List[FilteringColumn]],
-        ordering_columns: Optional[List[OrderingColumn]],
-        grouping_columns: Optional[List[GroupingColumn]]
+        filtered_columns: Optional[List[FilteredColumn]],
+        ordered_columns: Optional[List[OrderedColumn]],
+        grouped_columns: Optional[List[GroupedColumn]]
 ):
     Model = tables[table_name]["model"]
     if retrieved_columns is None:
         statement = select(Model)
-        statement = add_filter(statement, filtering_columns)
-        statement = add_order(statement, ordering_columns)
-        statement = add_group(statement, grouping_columns, Model)
+        statement = add_filter(statement, filtered_columns)
+        statement = add_order(statement, ordered_columns)
+        statement = add_group(statement, grouped_columns, Model)
         statement = statement.offset(offset).limit(limit)
         return session.scalars(statement).all()
     else:
         statement = select(*[getattr(Model, column) for column in retrieved_columns])
-        statement = add_filter(statement, filtering_columns)
-        statement = add_order(statement, ordering_columns)
-        statement = add_group(statement, grouping_columns, Model)
+        statement = add_filter(statement, filtered_columns)
+        statement = add_order(statement, ordered_columns)
+        statement = add_group(statement, grouped_columns, Model)
         statement = statement.offset(offset).limit(limit)
         return session.execute(statement).all()
     
@@ -180,15 +180,15 @@ def retrieve_models(
 def retrieve_schemas(
         session: Session, tables: dict, table_name: str,
         retrieved_columns: Optional[List[str]], offset: int, limit: int,
-        filtering_columns: Optional[List[FilteringColumn]],
-        ordering_columns: Optional[List[OrderingColumn]],
-        grouping_columns: Optional[List[GroupingColumn]],
+        filtered_columns: Optional[List[FilteredColumn]],
+        ordered_columns: Optional[List[OrderedColumn]],
+        grouped_columns: Optional[List[GroupedColumn]],
         verbose: bool = False
 ) -> List[BaseModel]:
     Model = tables[table_name]["model"]
     models = retrieve_models(
         session, Model, retrieved_columns, offset, limit,
-        filtering_columns, ordering_columns, grouping_columns
+        filtered_columns, ordered_columns, grouped_columns
     )
     if verbose:
         return [
@@ -203,28 +203,28 @@ def retrieve_schemas(
 def retrieve_model(
         session: Session, tables: dict, table_name: str,
         retrieved_columns: Optional[List[str]],
-        filtering_columns: Optional[List[FilteringColumn]]
+        filtered_columns: Optional[List[FilteredColumn]]
     ):
     Model = tables[table_name]["model"]
     if retrieved_columns is None:
         statement = select(Model)
-        statement = add_filter(statement, filtering_columns)
+        statement = add_filter(statement, filtered_columns)
         return session.scalars(statement).one()
     else:
         statement = select(*[getattr(Model, column) for column in retrieved_columns])
-        statement = add_filter(statement, filtering_columns)
+        statement = add_filter(statement, filtered_columns)
         return session.execute(statement).one()
 
 
 def retrieve_schema(
         session: Session, tables: dict, table_name: str,
         retrieved_columns: Optional[List[str]],
-        filtering_columns: Optional[List[FilteringColumn]],
+        filtered_columns: Optional[List[FilteredColumn]],
         verbose: bool = False
 ) -> BaseModel:
     Model = tables[table_name]["model"]
     model = retrieve_model(
-        session, Model, retrieved_columns,filtering_columns,
+        session, Model, retrieved_columns,filtered_columns,
     )
     if verbose:
         return tables[table_name]["verbose_schema"].model_validate(get_verbose_dict(model, tables))
@@ -236,7 +236,7 @@ def update_model(
         session: Session, tables: dict, table_name: str,
         updated_model_index: str, updated_model_body: BaseModel
     ) -> BaseModel:
-    filtering_column = FilteringColumn(
+    filtering_column = FilteredColumn(
         column=tables[table_name]["index_column"], value=updated_model_index
     )
     updated_model = retrieve_schema(
@@ -255,7 +255,7 @@ def delete_model(
         session: Session, tables: dict, table_name: str,
         deleted_model_index: str
     ) -> BaseModel:
-    filtering_column = FilteringColumn(
+    filtering_column = FilteredColumn(
         column=tables[table_name]["index_column"], value=deleted_model_index
     )
     deleted_model = retrieve_schema(
