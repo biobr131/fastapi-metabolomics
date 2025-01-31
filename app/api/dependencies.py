@@ -2,11 +2,11 @@ import os
 
 from sqlalchemy.orm import Session
 
-from db.session import get_sessionlocal
+from db.session import get_sessionmaker
 
 
-def get_session(dotenv_path: str):
-    SessionLocal = get_sessionlocal(dotenv_path)
+def get_session(dotenv_path: str) -> Session:
+    SessionLocal = get_sessionmaker(dotenv_path)
     return SessionLocal()
 
 

@@ -34,7 +34,7 @@ def get_engine(dotenv_path: str) -> engine.Engine:
     return create_engine(url_object)
 
 
-def get_sessionlocal(dotenv_path: str) -> sessionmaker:
+def get_sessionmaker(dotenv_path: str) -> sessionmaker:
     """
     データベース接続のためのSessionを作成する。
 
