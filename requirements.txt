@@ -1,2 +1,4 @@
 -r app/requirements/dev.txt
 -r notebooks/requirements.txt
+pyopenms
+pyteomics
