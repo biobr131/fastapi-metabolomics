@@ -146,7 +146,7 @@ def create_model(
         session: Session, tables: dict, table_name: str,
         created_model_body: BaseModel
     ) -> BaseModel:
-    created_model = tables[table_name]["schema"].model_validate(created_model_body)
+    created_model = tables[table_name].Meta.table_schema.model_validate(created_model_body)
     session.add(created_model)
     session.commit()
     session.refresh(created_model)
@@ -160,7 +160,7 @@ def retrieve_models(
         ordered_columns: Optional[List[OrderedColumn]],
         grouped_columns: Optional[List[GroupedColumn]]
 ):
-    Model = tables[table_name]["model"]
+    Model = tables[table_name]
     if retrieved_columns is None:
         statement = select(Model)
         statement = add_filter(statement, filtered_columns)
@@ -185,18 +185,17 @@ def retrieve_schemas(
         grouped_columns: Optional[List[GroupedColumn]],
         verbose: bool = False
 ) -> List[BaseModel]:
-    Model = tables[table_name]["model"]
     models = retrieve_models(
-        session, Model, retrieved_columns, offset, limit,
+        session, tables, table_name, retrieved_columns, offset, limit,
         filtered_columns, ordered_columns, grouped_columns
     )
     if verbose:
         return [
-            tables[table_name]["verbose_schema"].model_validate(get_verbose_dict(model, tables)) for model in models
+            tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(model, tables)) for model in models
         ]
     else:
         return [
-            tables[table_name]["schema"].model_validate(model) for model in models
+            tables[table_name].Meta.table_schema.model_validate(model) for model in models
         ]
     
 
@@ -205,7 +204,7 @@ def retrieve_model(
         retrieved_columns: Optional[List[str]],
         filtered_columns: Optional[List[FilteredColumn]]
     ):
-    Model = tables[table_name]["model"]
+    Model = tables[table_name]
     if retrieved_columns is None:
         statement = select(Model)
         statement = add_filter(statement, filtered_columns)
@@ -222,14 +221,13 @@ def retrieve_schema(
         filtered_columns: Optional[List[FilteredColumn]],
         verbose: bool = False
 ) -> BaseModel:
-    Model = tables[table_name]["model"]
     model = retrieve_model(
-        session, Model, retrieved_columns,filtered_columns,
+        session, tables, table_name, retrieved_columns, filtered_columns,
     )
     if verbose:
-        return tables[table_name]["verbose_schema"].model_validate(get_verbose_dict(model, tables))
+        return tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(model, tables))
     else:
-        return tables[table_name]["schema"].model_validate(model)
+        return tables[table_name].Meta.table_schema.model_validate(model)
 
 
 def update_model(
@@ -237,7 +235,7 @@ def update_model(
         updated_model_index: str, updated_model_body: BaseModel
     ) -> BaseModel:
     filtering_column = FilteredColumn(
-        column=tables[table_name]["index_column"], value=updated_model_index
+        column=tables[table_name].Meta.index_column, value=updated_model_index
     )
     updated_model = retrieve_schema(
         session, tables, table_name, filtering_columns=[filtering_column]
@@ -256,7 +254,7 @@ def delete_model(
         deleted_model_index: str
     ) -> BaseModel:
     filtering_column = FilteredColumn(
-        column=tables[table_name]["index_column"], value=deleted_model_index
+        column=tables[table_name].Meta.index_column, value=deleted_model_index
     )
     deleted_model = retrieve_schema(
         session, tables, table_name, filtering_columns=[filtering_column]

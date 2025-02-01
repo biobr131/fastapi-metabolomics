@@ -5,14 +5,10 @@ from fastapi.staticfiles import StaticFiles
 #from sqladmin import Admin
 
 #from db.session import get_engine
+from api.dependencies import read_boolean
 from api.routers import base
 
-
-def strtobool(value: str) -> bool:
-    """文字列をbool型に変換する。"""
-    return value.lower() in ('true', 't', 'yes', 'y', 'on', '1')
-
-DEBUG = bool(strtobool(str(os.environ.get("DEBUG", "False"))))
+DEBUG = read_boolean(str(os.environ.get("DEBUG", "False")))
 
 app = FastAPI(debug=DEBUG)
 
@@ -37,7 +33,7 @@ app.include_router(
     #dotenv_file = "db/.env.dev"
     #admin_url = "/admin"
 #engine = get_engine(dotenv_file)
-#admin = Admin(app, engine, base_url=admin_url)
+#admin = Admin(app, engine, base_url=admin_url, debug=DEBUG)
 #admin.add_view()
 
 if DEBUG:

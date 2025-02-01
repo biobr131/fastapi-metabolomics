@@ -9,14 +9,7 @@ from api.crud.base import (
 from api.schemas.base import RetrieveModelsQuery, RetrieveModelQuery
 from api.dependencies import get_session_dev, get_session_prod
 
-TABLES = {"table_name": {
-    "table_type": "master or transaction",
-    "model": "Model",
-    "schema": "Schema",
-    "verbose_schema": "VerboseSchema",
-    "column": "ModelColumn",
-    "index_column": "index_column"
-}}
+TABLES = {}
 
 HEALTH_CHECK_ROUTE = "health-check"
 
@@ -35,17 +28,17 @@ router_dev = APIRouter()
 async def check_health_dev(session: Session = Depends(get_session_dev)):
     return check_connection(session)
 
-"""
+
 @router_dev.post("/{table}")
 async def create_model_dev(
-    session: Session = Depends(get_db_dev), table: str = Path(), created_model_body: BaseModel = Body()
+    session: Session = Depends(get_session_dev), table: str = Path(), created_model_body: BaseModel = Body()
 ):
     return create_model(session, TABLES, table, created_model_body)
 
 
 @router_dev.get("/{table}/list")
 async def get_models_dev(
-    session: Session = Depends(get_db_dev), table: str = Path(),
+    session: Session = Depends(get_session_dev), table: str = Path(),
     retrieve_models_query: RetrieveModelsQuery = Query()
 ):
     retrieved_columns = retrieve_models_query.get_retrieved_columns(
@@ -69,7 +62,7 @@ async def get_models_dev(
 
 @router_dev.get("/{table}/{index}")
 async def get_model_dev(
-    session: Session, table: str = Path(), index: str = Path(),
+    session: Session = Depends(get_session_dev), table: str = Path(), index: str = Path(),
     retrieve_model_query: RetrieveModelQuery = Query(),
 ):
     retrieved_columns = retrieve_model_query.get_retrieved_columns(
@@ -79,14 +72,14 @@ async def get_model_dev(
         TABLES[table]["column"]
     )
     return retrieve_schema(
-        session, tables, table, index, retrieve_model_query.column,
+        session, TABLES, table, index, retrieve_model_query.column,
         retrieved_columns, filtering_columns
     )
 
 
 @router_dev.put("/{table}/{index}")
 async def update_model_dev(
-    session: Session, table: str = Path(), index: str = Path(),
+    session: Session = Depends(get_session_dev), table: str = Path(), index: str = Path(),
     updated_model_body = Body()
 ):
     return update_model(session, TABLES, table, index, updated_model_body)
@@ -94,7 +87,7 @@ async def update_model_dev(
 
 @router_dev.delete("/{table}/{index}")
 async def delete_model_dev(
-    session: Session, table: str = Path(), index: str = Path()
+    session: Session = Depends(get_session_dev), table: str = Path(), index: str = Path()
 ):
     return delete_model(session, TABLES, table, index)
-"""
+

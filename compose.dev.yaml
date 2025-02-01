@@ -59,7 +59,7 @@ services:
         VENV: "bioinfo"
         DIR_CONDA: "/opt/conda"
         REQ_TXT: "requirements.txt"
-    image: biobr131/fastapi-jupyter:latest
+    image: biobr131/fastapi-jupyter
     container_name: jupyter
     command: jupyter lab --ip=0.0.0.0 --allow-root --LabApp.token=''
     ports:

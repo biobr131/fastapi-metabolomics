@@ -1,7 +1,16 @@
 from enum import Enum
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy.orm import DeclarativeBase
+
+
+def register_tables(Models: List[type[DeclarativeBase]]):
+    tables = {}
+    for Model in Models:
+        table_name = Model.__tablename__
+        tables[table_name] = Model
+    return tables
 
 
 class FilteredColumn(BaseModel):
@@ -92,3 +101,28 @@ class RetrieveModelsQuery(RetrieveModelQuery):
                 GroupedColumn(column=getattr(model_column, column), aggr=getattr(AggregationOption, aggr_option)) for column, aggr_option in zip(self.group_by, self.group_aggr)
             ]
         return None
+    
+
+class BaseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BaseTablename(BaseSchema):
+    pass
+
+
+class TablenameTable(BaseTablename):
+    pass
+
+
+class ConciseTablename(BaseTablename):
+    pass
+
+
+class VerboseTablname(BaseTablename):
+    pass
+
+
+# TableModel.Meta.table_schema = TablenameTable
+# TableModel.Meta.concise_schema = ConciseTablename
+# TableModel.Meta.verbose_schema = VerboseTablename
