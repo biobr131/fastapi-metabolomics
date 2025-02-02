@@ -11,8 +11,8 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from app.main import app
 
-BASE_DIR = Path(__file__).parent.parent.parent
-config = dotenv_values(f"{BASE_DIR} / app / db / .env.test")
+BASE_DIR = Path(__file__).parent.parent
+config = dotenv_values(f"{BASE_DIR} / db / .env.test")
 TEST_DATABASE_URL = URL.create(
         "postgresql+psycopg",
         username=config["TEST_POSTGRES_USER"],

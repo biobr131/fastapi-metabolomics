@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from db.session import get_sessionmaker
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 def read_boolean(value: str) -> bool:
@@ -16,7 +19,7 @@ def get_session(dotenv_path: str) -> Session:
 
 
 async def get_session_prod():
-    with get_session("db/.env") as session:
+    with get_session(BASE_DIR / "db" / ".env") as session:
         try:
             yield session
         except:
@@ -25,7 +28,7 @@ async def get_session_prod():
 
 
 async def get_session_dev():
-    with get_session("db/.env.dev") as session:
+    with get_session(BASE_DIR / "db" / ".env.dev") as session:
         try:
             yield session
         except:
