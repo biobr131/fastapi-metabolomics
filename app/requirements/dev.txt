@@ -8,6 +8,7 @@ pytest-randomly
 pytest-cov
 pytest-structlog
 factory-boy
+sqlalchemy-utils
 fastapi-debug-toolbar
 sphinx
 --pre sqlacodegen
