@@ -1,7 +1,9 @@
 psycopg[binary]
 fastapi[all]
+fastapi-users[sqlalchemy]
 fastapi-structlog
 uvicorn[standard]
 sqlmodel
 alembic
 sqladmin[full]
+strawberry-graphql[asgi, fastapi]
