@@ -126,19 +126,19 @@ def get_verbose_dict(session: Session, model, tables):
         if column in foreign_key_columns:
             ReferenceModel = get_reference_model_class(column, tables)
             reference_model_table_name = ReferenceModel.__table__.name
-            reference_model_id = model.column
+            reference_model_id = getattr(model, column.name)
             filtering_column = FilteredColumn(
                 column=getattr(tables[reference_model_table_name], column), value=reference_model_id
             )
             reference_model = retrieve_model(
                 session, tables, reference_model_table_name, filtering_columns=[filtering_column]
             )
-            del model.column
+            delattr(model, column.name)
             setattr(
                 model, reference_model_table_name, get_verbose_dict(session, reference_model, tables)
             )
         else:
-            verbose_dict[column] = model.column
+            verbose_dict[column] = getattr(model, column.name)
     return verbose_dict
 
 
@@ -191,7 +191,7 @@ def retrieve_schemas(
     )
     if verbose:
         return [
-            tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(model, tables)) for model in models
+            tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(session, model, tables)) for model in models
         ]
     else:
         return [
@@ -225,7 +225,7 @@ def retrieve_schema(
         session, tables, table_name, retrieved_columns, filtered_columns,
     )
     if verbose:
-        return tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(model, tables))
+        return tables[table_name].Meta.verbose_schema.model_validate(get_verbose_dict(session, model, tables))
     else:
         return tables[table_name].Meta.table_schema.model_validate(model)
 
@@ -240,7 +240,7 @@ def update_model(
     updated_model = retrieve_schema(
         session, tables, table_name, filtering_columns=[filtering_column]
     )
-    updated_model_data = updated_model_body.dict(exclude_unset=True)
+    updated_model_data = updated_model_body.model_dump(exclude_unset=True)
     for key, value in updated_model_data.items():
         setattr(updated_model, key, value)
     session.add(updated_model)
