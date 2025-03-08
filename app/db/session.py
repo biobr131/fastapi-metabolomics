@@ -14,7 +14,7 @@ def get_engine(dotenv_path: str) -> engine.Engine:
     
     Returns
     -------
-    engine.Engine
+    sqlalchemy.engine.Engine
         データベース接続のためのEngine
     """
     config = dotenv_values(dotenv_path)
@@ -43,7 +43,7 @@ def get_sessionmaker(dotenv_path: str) -> sessionmaker:
     
     Returns
     -------
-    SessionLocal : sessionmaker
+    SessionLocal : sqlalchemy.orm.sessionmaker
         データベース接続のためのSession
     """
     engine = get_engine(dotenv_path)
